@@ -326,7 +326,7 @@ def user_authentication(client):
             continue
         break
 
-    print(result)
+    # print(result)
     user_id = result['user_profile']['user_id']
     user_token = result['auth_token']
     user_device = client.HEADERS.get("CH-DeviceId")
