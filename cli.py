@@ -11,6 +11,7 @@ import sys
 import threading
 import configparser
 import keyboard
+from termcolor import colored
 from rich.table import Table
 from rich.console import Console
 from clubhouse.clubhouse import Clubhouse
@@ -290,7 +291,7 @@ def chat_main(client):
                 args=(client, channel_name, user_id)
             )
 
-        input("[*] Press [Enter] to quit conversation.\n")
+        input(colored("[*] Press [Enter] to quit conversation.\n",'yellow'))
         keyboard.unhook_all()
 
         # Safely leave the channel upon quitting the channel.
@@ -360,7 +361,7 @@ def invite(client):
         print("Not have Invite")
         print("=" * 30)
         return
-    numberPhone = input("[.] Enter Phone number for invite: ")
+    numberPhone = input(colored("[.] Enter Phone number for invite: ",'cyan'))
 
     if str(numberPhone) == "Exit":
         return
@@ -383,7 +384,7 @@ def inviteWaitlist(client):
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("No.")
     table.add_column("Noti_id", style="cyan", justify="right")
-    table.add_column("user_id")
+    table.add_column("user_id", style="cyan", justify="right")
     table.add_column("username")
     table.add_column("type")
     table.add_column("name")
@@ -405,7 +406,7 @@ def inviteWaitlist(client):
 
     console.print(table)
 
-    user_id = input("[.] Enter No. for invite: ")
+    user_id = input(colored("[.] Enter No. for invite: ",'cyan'))
 
     if str(user_id) == "Exit":
         return
@@ -425,7 +426,7 @@ def Suggested_follows_all(client):
     console = Console()
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("No.")
-    table.add_column("user_id")
+    table.add_column("user_id", style="cyan", justify="right")
     table.add_column("username")
     table.add_column("name")
     table.add_column("bio")
@@ -451,32 +452,33 @@ def Suggested_follows_all(client):
     return
 
 def getProfile(client):
-    _user_id = input("Enter user_id for get profile: ")
+    _user_id = input(colored("Enter user_id for get profile: ",'cyan'))
     _res = client.get_profile(_user_id)
     _user = _res['user_profile']
 
     print("=" * 30)
 
-    print("[!] ID : " + str(_user['user_id']))
-    print("[!] name : " + str(_user['name']))
+    print("[!] ID          : " + str(_user['user_id']))
+    print("[!] name        : " + str(_user['name']))
     print("[!] displayname : " + str(_user['displayname']))
-    print("[!] username : @" + str(_user['username']))
+    print("[!] username    : @" + str(_user['username']))
     print()
-    print("[!] followers : " + str(_user['num_followers']) +", following : "+ str(_user['num_following']))
-    print("[!] follows me : " + str(_user['follows_me']))
+    print("[!] followers   : " + str(_user['num_followers']) +", following : "+ str(_user['num_following']))
+    print("[!] follows me  : " + str(_user['follows_me']))
     print()
-    print("[!] twitter : " + str(_user['twitter']))
-    print("[!] instagram : " + str(_user['instagram']))
+    print("[!] twitter     : " + str(_user['twitter']))
+    print("[!] instagram   : " + str(_user['instagram']))
     print()
     if _user['invited_by_user_profile'] != None:
         print("[!] invited : [" + str(_user['invited_by_user_profile']['user_id'])+"] "+ str(_user['invited_by_user_profile']['name']))
-    
+        print()
+   
+    print("[!] bio         : ")
+    print(str(_user['bio']))
     print()
-    print("[!] bio : " + str(_user['bio']))
-
     print("=" * 30)
 
-    _Following = input("[.] Following ? [Y/n]: ")
+    _Following = input(colored("[.] Following ? [Y/n]: ",'cyan'))
 
     if _Following == "Y":
         _res = client.follow(_user['user_id'])
@@ -486,7 +488,7 @@ def getProfile(client):
     return
 
 def addFollow(client):
-    user_id = input("[.] Enter user_id for Follow: ")
+    user_id = input(colored("[.] Enter user_id for Follow: ",'cyan'))
 
     try:
         if str(user_id) == "Exit":
@@ -502,12 +504,12 @@ def addFollow(client):
     return
 
 def getFollowing(client):
-    user_id = input("[.] Enter user_id for get Following: ")
+    user_id = input(colored("[.] Enter user_id for get Following: ",'cyan'))
 
     if str(user_id) == "Exit":
         return
 
-    _res = client.get_following(user_id, page_size=50, page=1)
+    _res = client.get_following(user_id, page_size=100, page=1)
 
     users = _res['users']
 
@@ -517,15 +519,11 @@ def getFollowing(client):
     table.add_column("user_id", style="cyan", justify="right")
     table.add_column("name")
     table.add_column("username")
-    table.add_column("twitter")
+    table.add_column("bio")
 
     i = 0
     for user in users:
         i += 1
-
-        _topic = ""
-        _channel = ""
-
         if i > int(len(users)):
             break
         table.add_row(
@@ -533,7 +531,7 @@ def getFollowing(client):
             str(user['user_id']),
             str(user['name']),
             str(user['username']),
-            str(user['twitter']),
+            str(user['bio']),
         )
 
     console.print(table)
@@ -543,7 +541,7 @@ def getFollowing(client):
 
 def searchUsers(client):
 
-    query = input("[.] Search User : ")
+    query = input(colored("[.] Search User : ",'cyan'))
 
     if str(query) == "Exit":
         return
@@ -558,6 +556,7 @@ def searchUsers(client):
     table.add_column("user_id", style="cyan", justify="right")
     table.add_column("name")
     table.add_column("username")
+    table.add_column("bio")
 
     i = 0
     for user in users:
@@ -573,6 +572,7 @@ def searchUsers(client):
             str(user['user_id']),
             str(user['name']),
             str(user['username']),
+            str(user['bio']),
         )
 
     console.print(table)
@@ -581,13 +581,13 @@ def searchUsers(client):
     return
 
 def getFollowers(client):
-    user_id = input("[.] Enter user_id for get Followers: ")
+    user_id = input(colored("[.] Enter user_id for get Followers: ",'cyan'))
 
     if str(user_id) == "Exit":
         print("=" * 30)
         return
 
-    _res = client.get_followers(user_id, page_size=50, page=1)
+    _res = client.get_followers(user_id, page_size=100, page=1)
 
     users = _res['users']
 
@@ -597,7 +597,7 @@ def getFollowers(client):
     table.add_column("user_id", style="cyan", justify="right")
     table.add_column("name")
     table.add_column("username")
-    table.add_column("twitter")
+    table.add_column("bio")
 
     i = 0
     for user in users:
@@ -613,7 +613,7 @@ def getFollowers(client):
             str(user['user_id']),
             str(user['name']),
             str(user['username']),
-            str(user['twitter']),
+            str(user['bio']),
         )
 
     console.print(table)
@@ -626,7 +626,7 @@ def getOnlineFriends(client):
     # print(_res)
     users = _res['users']
 
-    print("[!] Online Friends : " + str(len(users)))
+    print(colored("[!] Online Friends : ",'yellow') + str(len(users)))
 
     console = Console()
     table = Table(show_header=True, header_style="bold magenta")
@@ -670,12 +670,12 @@ def getOnlineFriends(client):
 
 
 def nameSetting(client):
-    print("[1] Update Username")
-    print("[2] Update Name")
-    print("[3] Update Display name")
-    print("[Eixt] back to main menu")    
+    print(colored("  [1]    Update Username", 'yellow'))
+    print(colored("  [2]    Update Name", 'yellow'))
+    print(colored("  [3]    Update Display name", 'yellow'))
+    print(colored("  [Exit] back to main menu", 'yellow'))    
     print("=" * 30)
-    _menu = int(input("[.] Enter Menu [1-3]: "))
+    _menu = int(input(colored("[.] Enter Menu [1-3]: ",'cyan')))
 
     if str(_menu) == "Exit":
         print("=" * 30)
@@ -714,35 +714,34 @@ def Profile(client):
     name = user_config.get('name')
     username = user_config.get('username')
     
-    print("=" * 30)
-    print("[!] ID : " + user_id)
-    print("[!] name : " + name)
+    print("[!] ID       : " + user_id)
+    print("[!] name     : " + name)
     print("[!] username : @" + username)
-    print("[!] invites : " + str(num_invites))
+    print("[!] invites  : " + str(num_invites))
     print("=" * 30)    
 
-
-    print("=" * 30)
     return
 
 def menu(client):
     while True:
-        print("[0] Notifications")
-        print("[1] Room Chat")
-        print("[2] Search Users")
-        print("[3] View Following")
-        print("[4] View Followers")
-        print("[5] Follow")
-        print("[6] Invite to App")
-        print("[7] Invite From Waitlist")
-        print("[8] Suggested follows all")
-        print("[9] Name Setting")
-        print("[10] Profile")
-        print("[11] Online Friends")
-        print("[12] Get Profile")
+        print(colored("  [0]  Notifications", 'yellow'))
+        print(colored("  [1]  Room Chat", 'yellow'))
+        print(colored("  [2]  Search Users", 'yellow'))
+        print(colored("  [3]  View Following", 'yellow'))
+        print(colored("  [4]  View Followers", 'yellow'))
+        print(colored("  [5]  Follow", 'yellow'))
+        print(colored("  [6]  Invite to App", 'yellow'))
+        print(colored("  [7]  Invite From Waitlist", 'yellow'))
+        print(colored("  [8]  Suggested follows all", 'yellow'))
+        print(colored("  [9]  Name Setting", 'yellow'))
+        print(colored("  [10] Profile", 'yellow'))
+        print(colored("  [11] Online Friends", 'yellow'))
+        print(colored("  [12] Get Profile", 'yellow'))
 
         print("=" * 30)
-        _menu = int(input("[.] Enter Menu [0-10]: "))
+        _menu = int(input(colored("[.] Enter Menu [0-10]: ", 'cyan')))
+        print("=" * 30)
+
         if _menu ==  0:
             noTi(client)
         elif _menu ==  1:
@@ -773,7 +772,7 @@ def menu(client):
 
 def noTi(client):
     _res  =  client.get_notifications()
-    print("[!] notifications : " + str(_res['count']))
+    print(colored("[!] notifications : ",'yellow') + str(_res['count']))
 
     console = Console()
     table = Table(show_header=True, header_style="bold magenta")
@@ -841,12 +840,12 @@ def main():
         _res = client.me()
         num_invites = _res['num_invites']
         print("=" * 30)
-        print("Club House Command V1")
+        print(colored("Club House Command V1",'yellow'))
         print("=" * 30)
-        print("[!] ID : " + user_id)
-        print("[!] name : " + name)
+        print("[!] ID       : " + user_id)
+        print("[!] name     : " + name)
         print("[!] username : @" + username)
-        print("[!] invites : " + str(num_invites))
+        print("[!] invites  : " + str(num_invites))
         print("=" * 30)
         noTi(client)
         getOnlineFriends(client)
