@@ -168,7 +168,7 @@ def chat_main(client):
 
     Main function for chat
     """
-    max_limit = 100
+    max_limit = 8000
     channel_speaker_permission = False
     _wait_func = None
     _ping_func = None
@@ -351,7 +351,11 @@ def user_authentication(client):
 
     return
 
-def invite(client,num_invites):
+def invite(client):
+    _res = client.me()
+    num_invites = _res['num_invites']
+    print("[!] invites : " + str(num_invites))
+
     if num_invites == 0:
         print("Not have Invite")
         print("=" * 30)
@@ -446,17 +450,53 @@ def Suggested_follows_all(client):
     print("=" * 30)
     return
 
+def getProfile(client):
+    _user_id = input("Enter user_id for get profile: ")
+    _res = client.get_profile(_user_id)
+    _user = _res['user_profile']
+
+    print("=" * 30)
+
+    print("[!] ID : " + str(_user['user_id']))
+    print("[!] name : " + str(_user['name']))
+    print("[!] displayname : " + str(_user['displayname']))
+    print("[!] username : @" + str(_user['username']))
+    print()
+    print("[!] followers : " + str(_user['num_followers']) +", following : "+ str(_user['num_following']))
+    print("[!] follows me : " + str(_user['follows_me']))
+    print()
+    print("[!] twitter : " + str(_user['twitter']))
+    print("[!] instagram : " + str(_user['instagram']))
+    print()
+    if _user['invited_by_user_profile'] != None:
+        print("[!] invited : [" + str(_user['invited_by_user_profile']['user_id'])+"] "+ str(_user['invited_by_user_profile']['name']))
     
+    print()
+    print("[!] bio : " + str(_user['bio']))
+
+    print("=" * 30)
+
+    _Following = input("[.] Following ? [Y/n]: ")
+
+    if _Following == "Y":
+        _res = client.follow(_user['user_id'])
+        print(_res)
+
+    print("=" * 30)
+    return
 
 def addFollow(client):
     user_id = input("[.] Enter user_id for Follow: ")
 
-    if str(user_id) == "Exit":
-        return
+    try:
+        if str(user_id) == "Exit":
+            return 
 
-    _res = client.follow(user_id)
+        _res = client.follow(user_id)
+        print(_res)
 
-    print(_res)
+    except:
+        return addFollow(client)
 
     print("=" * 30)
     return
@@ -581,11 +621,6 @@ def getFollowers(client):
 
     return
 
-def getProfile(client):
-    _res = client.get_profile(user_id);
-    print(_res)
-    return
-
 def getOnlineFriends(client):
     _res = client.get_online_friends()
     # print(_res)
@@ -632,6 +667,8 @@ def getOnlineFriends(client):
 
     return
 
+
+
 def nameSetting(client):
     print("[1] Update Username")
     print("[2] Update Name")
@@ -668,8 +705,29 @@ def nameSetting(client):
     print("=" * 30)
     return
 
-def menu(client,num_invites):
+def Profile(client):
+    _res = client.me()
+    num_invites = _res['num_invites']
+
+    user_config = read_config()
+    user_id = user_config.get('user_id')
+    name = user_config.get('name')
+    username = user_config.get('username')
+    
+    print("=" * 30)
+    print("[!] ID : " + user_id)
+    print("[!] name : " + name)
+    print("[!] username : @" + username)
+    print("[!] invites : " + str(num_invites))
+    print("=" * 30)    
+
+
+    print("=" * 30)
+    return
+
+def menu(client):
     while True:
+        print("[0] Notifications")
         print("[1] Room Chat")
         print("[2] Search Users")
         print("[3] View Following")
@@ -679,11 +737,15 @@ def menu(client,num_invites):
         print("[7] Invite From Waitlist")
         print("[8] Suggested follows all")
         print("[9] Name Setting")
+        print("[10] Profile")
+        print("[11] Online Friends")
+        print("[12] Get Profile")
 
         print("=" * 30)
-        _menu = int(input("[.] Enter Menu [1-9]: "))
-
-        if _menu ==  1:
+        _menu = int(input("[.] Enter Menu [0-10]: "))
+        if _menu ==  0:
+            noTi(client)
+        elif _menu ==  1:
             chat_main(client)
         elif _menu ==  2:
             searchUsers(client)
@@ -694,17 +756,22 @@ def menu(client,num_invites):
         elif _menu ==  5:
             addFollow(client)
         elif _menu ==  6:
-            invite(client,num_invites)
+            invite(client)
         elif _menu ==  7:
             inviteWaitlist(client)
         elif _menu ==  8:
             Suggested_follows_all(client)  
         elif _menu ==  9:
-            nameSetting(client)              
-
+            nameSetting(client)  
+        elif _menu ==  10:
+            Profile(client)    
+        elif _menu == 11:
+            getOnlineFriends(client)      
+        elif _menu == 12:
+            getProfile(client)      
     return
 
-def noTi(client,actionable_notifications_count):
+def noTi(client):
     _res  =  client.get_notifications()
     print("[!] notifications : " + str(_res['count']))
 
@@ -772,7 +839,6 @@ def main():
             process_onboarding(client)
 
         _res = client.me()
-        # print(_res)
         num_invites = _res['num_invites']
         print("=" * 30)
         print("Club House Command V1")
@@ -782,10 +848,9 @@ def main():
         print("[!] username : @" + username)
         print("[!] invites : " + str(num_invites))
         print("=" * 30)
-        noTi(client,_res['actionable_notifications_count'])
+        noTi(client)
         getOnlineFriends(client)
-        menu(client,num_invites)
-        # chat_main(client)
+        menu(client)
 
     else:
         client = Clubhouse()
