@@ -353,71 +353,76 @@ def user_authentication(client):
     return
 
 def invite(client):
-    _res = client.me()
-    num_invites = _res['num_invites']
-    print("[!] invites : " + str(num_invites))
+    try:
+        _res = client.me()
+        num_invites = _res['num_invites']
+        print("[!] invites : " + str(num_invites))
 
-    if num_invites == 0:
-        print("Not have Invite")
+        if num_invites == 0:
+            print("Not have Invite")
+            print("=" * 30)
+            return
+        numberPhone = input(colored("[.] Enter Phone number for invite: ",'cyan'))
+
+        if str(numberPhone) == "Exit":
+            return
+
+        _res = client.invite_to_app(None,numberPhone,"Hello")
+        print(_res)
+
         print("=" * 30)
-        return
-    numberPhone = input(colored("[.] Enter Phone number for invite: ",'cyan'))
-
-    if str(numberPhone) == "Exit":
-        return
-
-    _res = client.invite_to_app(None,numberPhone,"Hello")
-    print(_res)
-
-    print("=" * 30)
+    except:
+        return invite(client)
     
     return
 
 def inviteWaitlist(client):
-    _res  =  client.get_actionable_notifications()
-    print("[!] Let them in : " + str(_res['count']))
-    if _res['count'] == 0:
+    try:
+        _res  =  client.get_actionable_notifications()
+        print("[!] Let them in : " + str(_res['count']))
+        if _res['count'] == 0:
+            print("=" * 30)
+            return
+
+        console = Console()
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("No.")
+        table.add_column("Noti_id", style="cyan", justify="right")
+        table.add_column("user_id", style="cyan", justify="right")
+        table.add_column("username")
+        table.add_column("type")
+        table.add_column("name")
+
+        users = _res['notifications']
+        i = 0
+        for user in users:
+            i += 1
+            if i > _res['count']:
+                break
+            table.add_row(
+                str(i),
+                str(user['actionable_notification_id']),
+                str(user['user_profile']['user_id']),
+                str(user['user_profile']['username']),
+                str(user['type']),
+                str(user['user_profile']['name']),
+            )
+
+        console.print(table)
+
+        user_id = input(colored("[.] Enter No. for invite: ",'cyan'))
+
+        if str(user_id) == "Exit":
+            return
+        _res = client.invite_from_waitlist(int(users[int(user_id)  - 1]['user_profile']['user_id']))
+        print(_res)
+
+        _res = client.ignore_actionable_notification(int(users[int(user_id)  - 1]['actionable_notification_id']))
+        print(_res)
+
         print("=" * 30)
-        return
-
-    console = Console()
-    table = Table(show_header=True, header_style="bold magenta")
-    table.add_column("No.")
-    table.add_column("Noti_id", style="cyan", justify="right")
-    table.add_column("user_id", style="cyan", justify="right")
-    table.add_column("username")
-    table.add_column("type")
-    table.add_column("name")
-
-    users = _res['notifications']
-    i = 0
-    for user in users:
-        i += 1
-        if i > _res['count']:
-            break
-        table.add_row(
-            str(i),
-            str(user['actionable_notification_id']),
-            str(user['user_profile']['user_id']),
-            str(user['user_profile']['username']),
-            str(user['type']),
-            str(user['user_profile']['name']),
-        )
-
-    console.print(table)
-
-    user_id = input(colored("[.] Enter No. for invite: ",'cyan'))
-
-    if str(user_id) == "Exit":
-        return
-    _res = client.invite_from_waitlist(int(users[int(user_id)  - 1]['user_profile']['user_id']))
-    print(_res)
-
-    _res = client.ignore_actionable_notification(int(users[int(user_id)  - 1]['actionable_notification_id']))
-    print(_res)
-
-    print("=" * 30)
-    
+    except:
+        return inviteWaitlist(client)
     return
 
 def Suggested_follows_all(client):
@@ -499,128 +504,126 @@ def addFollow(client):
 
         _res = client.follow(user_id)
         print(_res)
+        print("=" * 30)
 
     except Exception:
         return addFollow(client)
-
-    print("=" * 30)
     return
 
 def getFollowing(client):
-    user_id = input(colored("[.] Enter user_id for get Following: ",'cyan'))
+    try:
+        user_id = input(colored("[.] Enter user_id for get Following: ",'cyan'))
 
-    if str(user_id) == "Exit":
-        return
+        if str(user_id) == "Exit":
+            return
 
-    _res = client.get_following(user_id, page_size=100, page=1)
+        _res = client.get_following(user_id, page_size=100, page=1)
 
-    users = _res['users']
+        users = _res['users']
 
-    console = Console()
-    table = Table(show_header=True, header_style="bold magenta")
-    table.add_column("No.")
-    table.add_column("user_id", style="cyan", justify="right")
-    table.add_column("name")
-    table.add_column("username")
-    table.add_column("bio")
+        console = Console()
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("No.")
+        table.add_column("user_id", style="cyan", justify="right")
+        table.add_column("name")
+        table.add_column("username")
+        table.add_column("bio")
 
-    i = 0
-    for user in users:
-        i += 1
-        if i > int(len(users)):
-            break
-        table.add_row(
-            str(i),
-            str(user['user_id']),
-            str(user['name']),
-            str(user['username']),
-            str(user['bio']),
-        )
+        i = 0
+        for user in users:
+            i += 1
+            if i > int(len(users)):
+                break
+            table.add_row(
+                str(i),
+                str(user['user_id']),
+                str(user['name']),
+                str(user['username']),
+                str(user['bio']),
+            )
 
-    console.print(table)
-    print("=" * 30)
-
+        console.print(table)
+        print("=" * 30)
+    except Exception:
+        return getFollowing(client)
     return
 
 def searchUsers(client):
+    try:
+        query = input(colored("[.] Search User : ",'cyan'))
 
-    query = input(colored("[.] Search User : ",'cyan'))
+        if str(query) == "Exit":
+            return
 
-    if str(query) == "Exit":
-        return
+        _res = client.search_users(query,False,False,False)
 
-    _res = client.search_users(query,False,False,False)
+        users = _res['users']
 
-    users = _res['users']
+        console = Console()
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("No.")
+        table.add_column("user_id", style="cyan", justify="right")
+        table.add_column("name")
+        table.add_column("username")
+        table.add_column("bio")
 
-    console = Console()
-    table = Table(show_header=True, header_style="bold magenta")
-    table.add_column("No.")
-    table.add_column("user_id", style="cyan", justify="right")
-    table.add_column("name")
-    table.add_column("username")
-    table.add_column("bio")
+        i = 0
+        for user in users:
+            i += 1
+            if i > int(len(users)):
+                break
+            table.add_row(
+                str(i),
+                str(user['user_id']),
+                str(user['name']),
+                str(user['username']),
+                str(user['bio']),
+            )
 
-    i = 0
-    for user in users:
-        i += 1
-
-        _topic = ""
-        _channel = ""
-
-        if i > int(len(users)):
-            break
-        table.add_row(
-            str(i),
-            str(user['user_id']),
-            str(user['name']),
-            str(user['username']),
-            str(user['bio']),
-        )
-
-    console.print(table)
-    print("=" * 30)
-
+        console.print(table)
+        print("=" * 30)
+    except Exception:
+        return searchUsers(client)
     return
 
 def getFollowers(client):
-    user_id = input(colored("[.] Enter user_id for get Followers: ",'cyan'))
+    try:
+        user_id = input(colored("[.] Enter user_id for get Followers: ",'cyan'))
 
-    if str(user_id) == "Exit":
+        if str(user_id) == "Exit":
+            print("=" * 30)
+            return
+
+        _res = client.get_followers(user_id, page_size=100, page=1)
+
+        users = _res['users']
+
+        console = Console()
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("No.")
+        table.add_column("user_id", style="cyan", justify="right")
+        table.add_column("name")
+        table.add_column("username")
+        table.add_column("bio")
+
+        i = 0
+        for user in users:
+            i += 1
+            if i > int(len(users)):
+                break
+            table.add_row(
+                str(i),
+                str(user['user_id']),
+                str(user['name']),
+                str(user['username']),
+                str(user['bio']),
+            )
+
+        console.print(table)
         print("=" * 30)
-        return
 
-    _res = client.get_followers(user_id, page_size=100, page=1)
-
-    users = _res['users']
-
-    console = Console()
-    table = Table(show_header=True, header_style="bold magenta")
-    table.add_column("No.")
-    table.add_column("user_id", style="cyan", justify="right")
-    table.add_column("name")
-    table.add_column("username")
-    table.add_column("bio")
-
-    i = 0
-    for user in users:
-        i += 1
-
-        _topic = ""
-        _channel = ""
-
-        if i > int(len(users)):
-            break
-        table.add_row(
-            str(i),
-            str(user['user_id']),
-            str(user['name']),
-            str(user['username']),
-            str(user['bio']),
-        )
-
-    console.print(table)
-    print("=" * 30)
+    except Exception:
+        return nameSetting(client)
 
     return
 
@@ -702,6 +705,8 @@ def nameSetting(client):
             print("=" * 30)
             return
         res = client.update_displayname(str(_input))
+    else:
+        return nameSetting(client)
     
     print(res)
 
@@ -725,6 +730,89 @@ def Profile(client):
 
     return
 
+def searchClubs(client):
+    _input = input("[.] Search clubs : ")
+
+    if str(_menu) == "Exit":
+        print("=" * 30)
+        return
+    try:
+        _res = client.search_clubs(_input,False,False,False)
+
+        users = _res['clubs']
+
+        console = Console()
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("No.")
+        table.add_column("club_id", style="cyan", justify="right")
+        table.add_column("name")
+        table.add_column("num_followers")
+        table.add_column("num_members")
+        table.add_column("is_member")
+        table.add_column("is_follower")
+        i = 0
+        for user in users:
+            i += 1
+
+            if i > int(len(users)):
+                break
+            table.add_row(
+                str(i),
+                str(user['club_id']),
+                str(user['name']),
+                str(user['num_followers']),
+                str(user['num_members']),
+                str(user['is_member']),
+                str(user['is_follower']),
+            )
+
+        console.print(table)
+        print("=" * 30)
+        
+    except Exception:
+        return searchClubs(client)
+    return
+
+def addInterest(client):
+    try:
+        _input = input("[.] Add club or topic [c/t]: ")
+        if _input == "c":
+            topic_id = input("[.] Enter topic_id : ")
+            _res = client.add_user_topic(None,topic_id)
+        elif _input == "t":
+            club_id = input("[.] Enter club_id : ")
+            _res = client.add_user_topic(club_id,None)
+        elif _input == "Eixt":
+            return
+
+        print(_res)
+        print("=" * 30)
+    except Exception:
+        return addInterest(client)
+    
+    return
+
+def rmInterest(client):
+    try:
+        _input = input("[.] Remove club or topic [c/t]: ")
+        if _input == "c":
+            topic_id = input("[.] Enter topic_id : ")
+            _res = client.remove_user_topic(None,topic_id)
+        elif _input == "t":
+            club_id = input("[.] Enter club_id : ")
+            _res = client.remove_user_topic(club_id,None)
+
+        elif _input == "Eixt":
+            return
+
+        print(_res)    
+        print("=" * 30)
+    except Exception:
+        return rmInterest(client)
+    
+    return   
+
+
 def menu(client):
     while True:
         print(colored("  [0]  Notifications", 'yellow'))
@@ -740,9 +828,11 @@ def menu(client):
         print(colored("  [10] Profile", 'yellow'))
         print(colored("  [11] Online Friends", 'yellow'))
         print(colored("  [12] Get Profile", 'yellow'))
-
+        print(colored("  [13] Get Clubs", 'yellow'))
+        print(colored("  [14] Add your're Interest", 'yellow'))
+        print(colored("  [15] Remove your're Interest", 'yellow'))
         print("=" * 30)
-        _menu = int(input(colored("[.] Enter Menu [0-10]: ", 'cyan')))
+        _menu = int(input(colored("[.] Enter Menu [0-15]: ", 'cyan')))
         print("=" * 30)
 
         if _menu ==  0:
@@ -770,7 +860,13 @@ def menu(client):
         elif _menu == 11:
             getOnlineFriends(client)      
         elif _menu == 12:
-            getProfile(client)      
+            getProfile(client)
+        elif _menu == 13:
+            searchClubs(client)
+        elif _menu == 14:
+            addInterest(client)
+        elif _menu == 15:
+            rmInterest(client)
     return
 
 def noTi(client):

@@ -1216,7 +1216,7 @@ class Clubhouse:
         return req.json()
 
     @require_authentication
-    def remove_user_topic(self, club_id, topic_id):
+    def remove_user_topic(self, club_id=None, topic_id=None):
         """ (Clubhouse, int, int) -> dict
 
         Remove user's interest
