@@ -459,6 +459,9 @@ def Suggested_follows_all(client):
 def getProfile(client):
     _user_id = input(colored("Enter user_id for get profile: ",'cyan'))
     try:
+        if str(user_id) == "Exit":
+            return 
+
         _res = client.get_profile(int(_user_id))
         _user = _res['user_profile']
 
