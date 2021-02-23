@@ -453,38 +453,41 @@ def Suggested_follows_all(client):
 
 def getProfile(client):
     _user_id = input(colored("Enter user_id for get profile: ",'cyan'))
-    _res = client.get_profile(_user_id)
-    _user = _res['user_profile']
+    try:
+        _res = client.get_profile(int(_user_id))
+        _user = _res['user_profile']
 
-    print("=" * 30)
+        print("=" * 30)
 
-    print("[!] ID          : " + str(_user['user_id']))
-    print("[!] name        : " + str(_user['name']))
-    print("[!] displayname : " + str(_user['displayname']))
-    print("[!] username    : @" + str(_user['username']))
-    print()
-    print("[!] followers   : " + str(_user['num_followers']) +", following : "+ str(_user['num_following']))
-    print("[!] follows me  : " + str(_user['follows_me']))
-    print()
-    print("[!] twitter     : " + str(_user['twitter']))
-    print("[!] instagram   : " + str(_user['instagram']))
-    print()
-    if _user['invited_by_user_profile'] != None:
-        print("[!] invited : [" + str(_user['invited_by_user_profile']['user_id'])+"] "+ str(_user['invited_by_user_profile']['name']))
+        print("[!] ID          : " + str(_user['user_id']))
+        print("[!] name        : " + str(_user['name']))
+        print("[!] displayname : " + str(_user['displayname']))
+        print("[!] username    : @" + str(_user['username']))
         print()
-   
-    print("[!] bio         : ")
-    print(str(_user['bio']))
-    print()
-    print("=" * 30)
+        print("[!] followers   : " + str(_user['num_followers']) +", following : "+ str(_user['num_following']))
+        print("[!] follows me  : " + str(_user['follows_me']))
+        print()
+        print("[!] twitter     : " + str(_user['twitter']))
+        print("[!] instagram   : " + str(_user['instagram']))
+        print()
+        if _user['invited_by_user_profile'] != None:
+            print("[!] invited : [" + str(_user['invited_by_user_profile']['user_id'])+"] "+ str(_user['invited_by_user_profile']['name']))
+            print()
+    
+        print("[!] bio         : ")
+        print(str(_user['bio']))
+        print()
+        print("=" * 30)
 
-    _Following = input(colored("[.] Following ? [Y/n]: ",'cyan'))
+        _Following = input(colored("[.] Following ? [Y/n]: ",'cyan'))
 
-    if _Following == "Y":
-        _res = client.follow(_user['user_id'])
-        print(_res)
+        if _Following == "Y":
+            _res = client.follow(_user['user_id'])
+            print(_res)
 
-    print("=" * 30)
+        print("=" * 30)
+    except:
+        return getProfile(client)
     return
 
 def addFollow(client):
@@ -497,7 +500,7 @@ def addFollow(client):
         _res = client.follow(user_id)
         print(_res)
 
-    except:
+    except Exception:
         return addFollow(client)
 
     print("=" * 30)
