@@ -773,6 +773,51 @@ def searchClubs(client):
         return searchClubs(client)
     return
 
+def getTopics(client):
+    try:
+        _res = client.get_all_topics()
+        users = _res['topics']
+
+        console = Console()
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("No.")
+        table.add_column("id", style="cyan", justify="right")
+        table.add_column("title")
+        ct = 0
+        i = 0
+
+        for user in users:
+            i += 1
+            ct += 1
+            if i > int(len(users)):
+                break
+            table.add_row(
+                str(ct),
+                str(user['id']),
+                str(user['title']),
+            )
+            usersj = user['topics']
+            j = 0
+            for userj in usersj:
+
+                j += 1
+                ct += 1
+                if j > int(len(usersj)):
+                    break
+                table.add_row(
+                    str(ct),
+                    str(userj['id']),
+                    str(userj['title']),
+                )
+
+        console.print(table)
+        print("=" * 30)
+    except Exception:
+        return
+    return
+
+
+
 def addInterest(client):
     try:
         _input = input("[.] Add club or topic [c/t]: ")
@@ -829,10 +874,11 @@ def menu(client):
         print(colored("  [11] Online Friends", 'yellow'))
         print(colored("  [12] Get Profile", 'yellow'))
         print(colored("  [13] Get Clubs", 'yellow'))
-        print(colored("  [14] Add your're Interest", 'yellow'))
-        print(colored("  [15] Remove your're Interest", 'yellow'))
+        print(colored("  [14] Get Topics", 'yellow'))
+        print(colored("  [15] Add your're Interest", 'yellow'))
+        print(colored("  [16] Remove your're Interest", 'yellow'))
         print("=" * 30)
-        _menu = int(input(colored("[.] Enter Menu [0-15]: ", 'cyan')))
+        _menu = int(input(colored("[.] Enter Menu [0-16]: ", 'cyan')))
         print("=" * 30)
 
         if _menu ==  0:
@@ -864,8 +910,10 @@ def menu(client):
         elif _menu == 13:
             searchClubs(client)
         elif _menu == 14:
-            addInterest(client)
+            getTopics(client)
         elif _menu == 15:
+            addInterest(client)
+        elif _menu == 16:
             rmInterest(client)
     return
 
