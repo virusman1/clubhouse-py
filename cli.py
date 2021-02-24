@@ -796,7 +796,7 @@ def getTopics(client):
                 break
             table.add_row(
                 str(ct),
-                str(user['id']),
+                str("-"),
                 str(user['title']),
             )
             usersj = user['topics']
